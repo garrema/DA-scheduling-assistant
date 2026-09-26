@@ -19,9 +19,6 @@ React + Tailwind · Express + Node.js · MongoDB · FastAPI + Python · Google O
 - Independent validation before saving assignments or publishing; cross-week published shifts affect rest and continuous work.
 - Separate neighborhood data, optimistic revision checks, timezone-aware times, and a responsive interface.
 
-## Scope and assumptions
-
-This is a complete **standalone pilot application**, not a replacement for every When I Work feature. No When I Work integration, Outlook delivery, clock-in/out, payroll, open-shift claiming, automatic swaps, email reminders, or campus SSO is implemented. Those are future work, not hidden integrations.
 
 Each user belongs to exactly one neighborhood. A manager sees that neighborhood only. Seed additional neighborhoods with different manager emails. Cross-neighborhood employment and a central multi-neighborhood dashboard need a shared employee model before implementation.
 
@@ -33,27 +30,3 @@ The optimizer assigns the manager's coverage blocks; it does not search every po
 
 DST weeks can have 167/169 hours. Use appropriate allowed durations (including one hour when necessary) or manually configured coverage; ambiguous/nonexistent local entry times are rejected by the browser. Weekly limits are elapsed hours. Shifts cannot span the Monday boundary; split them. Rest is still checked across that boundary. Imported neighboring weeks must be published to participate in checks.
 
-## Quick commands
-
-After installing dependencies and configuring `.env` files as described in setup:
-
-```powershell
-npm run seed
-npm run dev
-```
-
-Run the Python scheduler in a separate terminal. Open http://localhost:5173.
-
-For a built app: `npm run build`, set `CLIENT_ORIGIN=http://localhost:4000`, then `npm start` and open http://localhost:4000. Production HTTPS requires `NODE_ENV=production`; the secure cookie will not work on plain HTTP in that mode.
-
-## Tests and evidence
-
-See [TEST_RESULTS.md](docs/TEST_RESULTS.md). `npm test` runs API tests with a disposable MongoDB process (downloaded on first use); the optional `IN_MEMORY_TEST=1` test mode verifies API behavior without a MongoDB process. That mode does **not** verify database durability. Python tests use the actual OR-Tools solver.
-
-See [GitHub instructions](docs/GITHUB.md). Dependencies, secrets and local environment files are intentionally excluded from the ZIP and Git. Commit the lock files.
-
-## Before using real schedules
-
-Run one neighborhood alongside the current process; confirm rules and coverage with its manager. Record baseline scheduling time and corrections, then compare against a generated-and-reviewed schedule. A time-limited feasible result is not necessarily optimal. The system cannot manufacture coverage when nobody is eligible.
-
-For public deployment, configure HTTPS, private authenticated MongoDB, a private scheduler service, the exact browser origin, database backups and an account recovery process. The pilot uses manager-created passwords and has no reset-by-email or institutional approval integration. Do not expose the demo preview server; it intentionally has no persistent database.
