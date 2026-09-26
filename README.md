@@ -3,7 +3,6 @@
 A full-stack, manager-reviewed scheduling prototype for university desk assistants.
 React + Tailwind · Express + Node.js · MongoDB · FastAPI + Python · Google OR-Tools.
 
-**Start here:** [Windows setup](docs/SETUP_WINDOWS.md) → [first-use tutorial](docs/FIRST_RUN.md) → [architecture and concepts](docs/ARCHITECTURE.md) → [line-by-line code reader](docs/LINE_BY_LINE.html).
 
 ## What is implemented
 
