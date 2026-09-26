@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  scheduler:
+    build: ./scheduler
+    environment:
+      SCHEDULER_KEY: ${SCHEDULER_KEY:?Set SCHEDULER_KEY in root .env}
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:4000:4000"
+    environment:
+      PORT: 4000
+      MONGODB_URI: mongodb://mongo:27017/da_scheduler
+      SCHEDULER_URL: http://scheduler:8000
+      SCHEDULER_KEY: ${SCHEDULER_KEY:?Set SCHEDULER_KEY}
+      CLIENT_ORIGIN: http://localhost:4000
+      NODE_ENV: development
+      SEED_EMAIL: ${SEED_EMAIL:?Set SEED_EMAIL}
+      SEED_PASSWORD: ${SEED_PASSWORD:?Set SEED_PASSWORD}
+      SEED_NAME: ${SEED_NAME:-Manager}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      scheduler:
+        condition: service_started
+volumes:
+  mongo_data:

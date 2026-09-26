@@ -1,0 +1,29 @@
+name: Check project
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: pip install -r scheduler/requirements.txt
+      - run: python -m pytest -q
+        working-directory: scheduler
+      - name: API tests with real solver and disposable MongoDB
+        env:
+          SCHEDULER_KEY: ci-local-service-secret
+        run: |
+          python -m uvicorn main:app --app-dir scheduler --port 8000 > /tmp/scheduler.log 2>&1 &
+          solver_pid=$!
+          trap 'kill "$solver_pid"' EXIT
+          python -c "import time,urllib.request; time.sleep(2); urllib.request.urlopen('http://127.0.0.1:8000/health')"
+          npm test
+      - run: npm run test:ui
+      - run: npm run build
